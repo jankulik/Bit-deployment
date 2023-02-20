@@ -1,44 +1,53 @@
 import { useRef } from 'react';
-import { Text, Group, Button, createStyles } from '@mantine/core';
+import { Text, Group, Button } from '@mantine/core';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { IconCloudUpload, IconX, IconDownload } from '@tabler/icons';
-
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    position: 'relative',
-    marginBottom: 30,
-  },
-
-  dropzone: {
-    borderWidth: 1,
-    paddingBottom: 50,
-  },
-
-  icon: {
-    color: theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[4],
-  },
-
-  control: {
-    position: 'absolute',
-    width: 250,
-    left: 'calc(50% - 125px)',
-    bottom: -20,
-  },
-}));
+import { useState } from 'react';
+import { useStyles } from './styles';
 
 export default function DropzoneButton() {
-  const { classes, theme } = useStyles();
+  const { classes, cx, theme } = useStyles();
   const openRef = useRef<() => void>(null);
+
+  const [file, setFile] = useState<any>();
+  const [array, setArray] = useState<any>([]);
+
+  const csvToArray = (text: string) => {
+    const csvHeader = text.slice(0, text.indexOf("\n")).split(",");
+    const csvRows = text.slice(text.indexOf("\n") + 1).split("\n");
+
+    const array = csvRows.map(i => {
+      const values = i.split(",");
+      const obj = csvHeader.reduce((object: any, header, index) => {
+        object[header] = values[index];
+        return object;
+      }, {});
+      return obj;
+    });
+
+    setArray(array);
+  };
 
   return (
     <div className={classes.wrapper}>
       <Dropzone
         openRef={openRef}
-        onDrop={() => {}}
         className={classes.dropzone}
         radius="md"
         accept={[MIME_TYPES.csv]}
         maxSize={30 * 1024 ** 2}
+        onDrop={(file) => {
+          setFile(file[0]);
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event: any) {
+              const text = event.target.result;
+              csvToArray(text);
+            };
+
+            reader.readAsText(file[0]);
+          }
+        }}
       >
         <div style={{ pointerEvents: 'none' }}>
           <Group position="center">
@@ -60,10 +69,10 @@ export default function DropzoneButton() {
           <Text align="center" weight={700} size="lg" mt="xl">
             <Dropzone.Accept>Drop files here</Dropzone.Accept>
             <Dropzone.Reject>CSV file less than 30mb</Dropzone.Reject>
-            <Dropzone.Idle>Upload resume</Dropzone.Idle>
+            <Dropzone.Idle>Upload data</Dropzone.Idle>
           </Text>
           <Text align="center" size="sm" mt="xs" color="dimmed">
-            Drag&apos;n&apos;drop files here to upload. We can accept only <i>.csv</i> files that
+            Drag and drop the file here to upload. We can accept only <i>.csv</i> files that
             are less than 30mb in size.
           </Text>
         </div>
