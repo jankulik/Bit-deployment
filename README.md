@@ -1,6 +1,6 @@
 ## Machinery price prediction tool web interface
 
-In order to run, first install Docker from the [https://docs.docker.com/get-docker/](official site). Then, pull the latest TensorFlow Serving image by running:
+In order to run, first install Docker from the [official site](https://docs.docker.com/get-docker/). Then, pull the latest TensorFlow Serving image by running:
 
 ```bash
 docker pull tensorflow/serving
@@ -32,4 +32,4 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Note: if you are running both the server and the webapp locally, it is possible that a CORS policy error will occur. In this case you can use an [https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf?hl=en](Allow CORS) extension, which will fix the issue.
+Note: if you are running both the server and the webapp locally, it is possible that a CORS policy error will occur. In this case you can use an [Allow CORS](https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf?hl=en) extension, which will fix the issue.
