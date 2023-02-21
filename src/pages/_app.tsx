@@ -26,11 +26,6 @@ export default function App(props: AppProps) {
           colorScheme: 'light',
           cursorType: 'pointer',
           activeStyles: { transform: 'scale(0.98)' },
-          colors: {
-            // primary color: [6]
-            brand: ['#ebfbee', '#ff0000', '#ff0000', '#ff0000', '#69db7c', '#ff0000', '#40c057', '#37b24d', '#ff0000', '#ff0000'],
-          },
-          primaryColor: 'brand',
           globalStyles: (theme) => ({
             '*, *::before, *::after': {
               boxSizing: 'border-box',

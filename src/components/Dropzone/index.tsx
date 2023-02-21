@@ -2,30 +2,62 @@ import { useRef } from 'react';
 import { Text, Group, Button } from '@mantine/core';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { IconCloudUpload, IconX, IconDownload } from '@tabler/icons';
-import { useState } from 'react';
 import { useStyles } from './styles';
 
 export default function DropzoneButton() {
-  const { classes, cx, theme } = useStyles();
+  const { classes, theme } = useStyles();
   const openRef = useRef<() => void>(null);
 
-  const [file, setFile] = useState<any>();
-  const [array, setArray] = useState<any>([]);
+  async function postData(url = '', data = {}) {
+    console.log(data);
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    console.log(response);
+    return response.json();
+  }
 
-  const csvToArray = (text: string) => {
-    const csvHeader = text.slice(0, text.indexOf("\n")).split(",");
-    const csvRows = text.slice(text.indexOf("\n") + 1).split("\n");
+  const csvParser = (text: string) => {
+    let arr = text.split('\n');
+    var jsonObject = [];
+    var headers = arr[0].split(',');
+    for (var i = 1; i < arr.length; i++) {
+      var data = arr[i].split(',');
+      var obj: any = {};
+      for (var j = 0; j < data.length; j++) {
+        obj[headers[j].trim()] = data[j].trim();
+      }
+      jsonObject.push(obj);
+    }
 
-    const array = csvRows.map(i => {
-      const values = i.split(",");
-      const obj = csvHeader.reduce((object: any, header, index) => {
-        object[header] = values[index];
-        return object;
-      }, {});
-      return obj;
+    const yearMean = 1993.914251
+    const hoursMean = 2672.779697
+
+    jsonObject = jsonObject.map(object => ({ ...object, "Sales Timestamp": Date.parse(object['Sales date'] + ' GMT') / 1000 }));
+
+    jsonObject.forEach(object => {
+      delete object[''];
+      delete object['Sales Price']
+      delete object['Sales ID'];
+      delete object['Machine ID'];
+      delete object['Model ID'];
+      delete object['Sales date'];
     });
 
-    setArray(array);
+    jsonObject = jsonObject.map(object => {
+      object["Year Made"] == 1000 ? object["Year Made"] = yearMean : null;
+      object["MachineHours CurrentMeter"] == "" ? object["MachineHours CurrentMeter"] = hoursMean : null;
+      return object;
+    });
+
+    jsonObject = JSON.parse(JSON.stringify(jsonObject).replace(/""/g, '"None or Unspecified"'));
+    console.log(jsonObject);
+
+    postData("http://localhost:8501/v1/models/model:predict", { "instances": jsonObject })
+      .then((data) => {
+        console.log(data);
+      });
   };
 
   return (
@@ -37,12 +69,11 @@ export default function DropzoneButton() {
         accept={[MIME_TYPES.csv]}
         maxSize={30 * 1024 ** 2}
         onDrop={(file) => {
-          setFile(file[0]);
           if (file) {
             const reader = new FileReader();
             reader.onload = function (event: any) {
               const text = event.target.result;
-              csvToArray(text);
+              csvParser(text);
             };
 
             reader.readAsText(file[0]);
