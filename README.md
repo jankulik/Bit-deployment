@@ -24,9 +24,10 @@ docker run -p 8501:8501 \
   -e MODEL_NAME=model -t tensorflow/serving &
 ```
 
-Finally, run the development server:
+Finally, install all required packages and run the development server:
 
 ```bash
+npm install
 npm run dev
 ```
 

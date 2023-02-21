@@ -15,7 +15,7 @@ export default function dataPreprocessing(textData: string) {
     const input_1 = [object["Year Made"], object["MachineHours CurrentMeter"], object["Sales Timestamp"]];
 
     delete object[""];
-    delete object["Sales Price"]
+    delete object["Sales Price"];
     delete object["Sales ID"];
     delete object["Machine ID"];
     delete object["Model ID"];

@@ -42,7 +42,15 @@ export default function Home() {
 
     postData("http://localhost:8501/v1/models/model:predict", { "instances": dataPreprocessing(textData) })
       .then((responseData) => {
-        const jsonData = csvToJson(textData).map((object, index) => ({ "Sales Price": responseData.predictions[index][0], ...object }));
+        const jsonData = csvToJson(textData).map((object, index) => {
+          if (object.hasOwnProperty("Sales Price")) {
+            object["Sales Price"] = responseData.predictions[index][0];
+            
+            return object;
+          }
+          return ({ "Sales Price": responseData.predictions[index][0], ...object });
+        });
+
         setCsvData(jsonToCsv(jsonData));
         setButtonLoading(false);
       });
@@ -51,7 +59,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Deployed Model</title>
+        <title>Price Prediction Tool</title>
       </Head>
       <div className={classes.wrapper}>
         <DropzoneButton handleUpload={handleUpload} />
