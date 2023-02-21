@@ -3,7 +3,11 @@ import { createStyles } from '@mantine/core';
 export const useStyles = createStyles((theme, _params, getRef) => ({
   wrapper: {
     position: 'relative',
-    marginBottom: 30,
+    marginBottom: 20,
+
+    [theme.fn.smallerThan('sm')]: {
+      width: '94vw',
+    },
   },
 
   dropzone: {

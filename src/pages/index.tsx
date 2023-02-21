@@ -7,7 +7,6 @@ import dataPreprocessing from '../utils/helpers/dataPreprocessing';
 import csvToJson from '../utils/helpers/csvToJson';
 import jsonToCsv from '../utils/helpers/jsonToCsv';
 import { Button } from '@mantine/core';
-import { IconCloudDownload } from '@tabler/icons';
 import { CSVLink } from 'react-csv';
 import { useEffect } from 'react';
 
@@ -45,7 +44,6 @@ export default function Home() {
       .then((responseData) => {
         const jsonData = csvToJson(textData).map((object, index) => ({ "Sales Price": responseData.predictions[index][0], ...object }));
         setCsvData(jsonToCsv(jsonData));
-        console.log(jsonToCsv(jsonData));
         setButtonLoading(false);
       });
   }
@@ -65,7 +63,6 @@ export default function Home() {
           >
             <Button
               className={classes.control}
-              leftIcon={<IconCloudDownload size={16} />}
               size="md"
               radius="xl"
             >
@@ -81,8 +78,8 @@ export default function Home() {
           >
             <Button
               className={classes.control}
-              leftIcon={<IconCloudDownload size={16} />}
               loading={buttonLoading}
+              loaderPosition="center"
               size="md"
               radius="xl"
             >
@@ -92,7 +89,6 @@ export default function Home() {
           :
           <Button
             className={classes.control}
-            leftIcon={<IconCloudDownload size={16} />}
             disabled
             size="md"
             radius="xl"

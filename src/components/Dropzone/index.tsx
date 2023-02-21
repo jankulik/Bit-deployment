@@ -56,7 +56,7 @@ export default function DropzoneButton({ handleUpload }: DropzoneButtonProps) {
           </Text>
           <Text align="center" size="sm" mt="xs" color="dimmed">
             Drag and drop the file here to upload. We can accept only <i>.csv</i> files that
-            are less than 30mb in size.
+            follow the template and are less than 30mb in size.
           </Text>
         </div>
       </Dropzone>
