@@ -9,7 +9,6 @@ export default function DropzoneButton() {
   const openRef = useRef<() => void>(null);
 
   async function postData(url = '', data = {}) {
-    console.log(data);
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -20,12 +19,12 @@ export default function DropzoneButton() {
 
   const csvParser = (text: string) => {
     let arr = text.split('\n');
-    var jsonObject = [];
-    var headers = arr[0].split(',');
-    for (var i = 1; i < arr.length; i++) {
-      var data = arr[i].split(',');
-      var obj: any = {};
-      for (var j = 0; j < data.length; j++) {
+    let jsonObject = [];
+    let headers = arr[0].split(',');
+    for (let i = 1; i < arr.length; i++) {
+      let data = arr[i].split(',');
+      let obj: any = {};
+      for (let j = 0; j < data.length; j++) {
         obj[headers[j].trim()] = data[j].trim();
       }
       jsonObject.push(obj);
@@ -36,19 +35,25 @@ export default function DropzoneButton() {
 
     jsonObject = jsonObject.map(object => ({ ...object, "Sales Timestamp": Date.parse(object['Sales date'] + ' GMT') / 1000 }));
 
-    jsonObject.forEach(object => {
-      delete object[''];
-      delete object['Sales Price']
-      delete object['Sales ID'];
-      delete object['Machine ID'];
-      delete object['Model ID'];
-      delete object['Sales date'];
-    });
-
     jsonObject = jsonObject.map(object => {
-      object["Year Made"] == 1000 ? object["Year Made"] = yearMean : null;
-      object["MachineHours CurrentMeter"] == "" ? object["MachineHours CurrentMeter"] = hoursMean : null;
-      return object;
+      object["Year Made"] == 1000 ? object["Year Made"] = yearMean : object["Year Made"] = parseFloat(object["Year Made"]);
+      object["MachineHours CurrentMeter"] == "" ? object["MachineHours CurrentMeter"] = hoursMean : object["MachineHours CurrentMeter"] = parseFloat(object["MachineHours CurrentMeter"]);
+      object["Sales Timestamp"] = parseFloat(object["Sales Timestamp"])
+
+      const input_1 = [object["Year Made"], object["MachineHours CurrentMeter"], object["Sales Timestamp"]];
+
+      delete object[""];
+      delete object["Sales Price"]
+      delete object["Sales ID"];
+      delete object["Machine ID"];
+      delete object["Model ID"];
+      delete object["Sales date"];
+      delete object["Year Made"];
+      delete object["MachineHours CurrentMeter"];
+      delete object["Sales Timestamp"];
+
+      const input_2 = Object.values(object);
+      return { input_1, input_2 };
     });
 
     jsonObject = JSON.parse(JSON.stringify(jsonObject).replace(/""/g, '"None or Unspecified"'));
