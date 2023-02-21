@@ -4,66 +4,13 @@ import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { IconCloudUpload, IconX, IconDownload } from '@tabler/icons';
 import { useStyles } from './styles';
 
-export default function DropzoneButton() {
+interface DropzoneButtonProps {
+  handleUpload(textData: string): any;
+}
+
+export default function DropzoneButton({ handleUpload }: DropzoneButtonProps) {
   const { classes, theme } = useStyles();
   const openRef = useRef<() => void>(null);
-
-  async function postData(url = '', data = {}) {
-    const response = await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-    console.log(response);
-    return response.json();
-  }
-
-  const csvParser = (text: string) => {
-    let arr = text.split('\n');
-    let jsonObject = [];
-    let headers = arr[0].split(',');
-    for (let i = 1; i < arr.length; i++) {
-      let data = arr[i].split(',');
-      let obj: any = {};
-      for (let j = 0; j < data.length; j++) {
-        obj[headers[j].trim()] = data[j].trim();
-      }
-      jsonObject.push(obj);
-    }
-
-    const yearMean = 1993.914251
-    const hoursMean = 2672.779697
-
-    jsonObject = jsonObject.map(object => ({ ...object, "Sales Timestamp": Date.parse(object['Sales date'] + ' GMT') / 1000 }));
-
-    jsonObject = jsonObject.map(object => {
-      object["Year Made"] == 1000 ? object["Year Made"] = yearMean : object["Year Made"] = parseFloat(object["Year Made"]);
-      object["MachineHours CurrentMeter"] == "" ? object["MachineHours CurrentMeter"] = hoursMean : object["MachineHours CurrentMeter"] = parseFloat(object["MachineHours CurrentMeter"]);
-      object["Sales Timestamp"] = parseFloat(object["Sales Timestamp"])
-
-      const input_1 = [object["Year Made"], object["MachineHours CurrentMeter"], object["Sales Timestamp"]];
-
-      delete object[""];
-      delete object["Sales Price"]
-      delete object["Sales ID"];
-      delete object["Machine ID"];
-      delete object["Model ID"];
-      delete object["Sales date"];
-      delete object["Year Made"];
-      delete object["MachineHours CurrentMeter"];
-      delete object["Sales Timestamp"];
-
-      const input_2 = Object.values(object);
-      return { input_1, input_2 };
-    });
-
-    jsonObject = JSON.parse(JSON.stringify(jsonObject).replace(/""/g, '"None or Unspecified"'));
-    console.log(jsonObject);
-
-    postData("http://localhost:8501/v1/models/model:predict", { "instances": jsonObject })
-      .then((data) => {
-        console.log(data);
-      });
-  };
 
   return (
     <div className={classes.wrapper}>
@@ -78,7 +25,7 @@ export default function DropzoneButton() {
             const reader = new FileReader();
             reader.onload = function (event: any) {
               const text = event.target.result;
-              csvParser(text);
+              handleUpload(text);
             };
 
             reader.readAsText(file[0]);
