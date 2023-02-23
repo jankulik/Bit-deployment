@@ -9,6 +9,8 @@ import jsonToCsv from '../utils/helpers/jsonToCsv';
 import { Button } from '@mantine/core';
 import { CSVLink } from 'react-csv';
 import { useEffect } from 'react';
+import { showNotification } from '@mantine/notifications';
+import { IconCheck, IconX } from '@tabler/icons';
 
 export default function Home() {
   const { classes, theme } = useStyles();
@@ -34,7 +36,7 @@ export default function Home() {
       body: JSON.stringify(data),
     });
 
-    return response.json();
+    return response;
   }
 
   const handleUpload = (textData: string) => {
@@ -42,10 +44,24 @@ export default function Home() {
 
     postData("http://localhost:8501/v1/models/model:predict", { "instances": dataPreprocessing(textData) })
       .then((responseData) => {
+        if (responseData.ok) {
+          return responseData.json();
+        }
+        throw new Error('Something went wrong');
+      })
+      .then((responseData) => {
+        showNotification({
+          autoClose: 10000,
+          title: "Predictions have been calculated successfully",
+          message: null,
+          color: 'teal',
+          icon: <IconCheck />
+        });
+
         const jsonData = csvToJson(textData).map((object, index) => {
           if (object.hasOwnProperty("Sales Price")) {
             object["Sales Price"] = responseData.predictions[index][0];
-            
+
             return object;
           }
           return ({ "Sales Price": responseData.predictions[index][0], ...object });
@@ -53,6 +69,16 @@ export default function Home() {
 
         setCsvData(jsonToCsv(jsonData));
         setButtonLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        showNotification({
+          autoClose: 10000,
+          title: "Something went wrong",
+          message: null,
+          color: 'red',
+          icon: <IconX />
+        });
       });
   }
 
