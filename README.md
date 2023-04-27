@@ -1,14 +1,14 @@
-## Machinery price prediction tool web interface
+# Machinery price prediction tool web interface
 
 In order to run, first install Docker from the [official site](https://docs.docker.com/get-docker/). Then, pull the latest TensorFlow Serving image by running:
 
-```bash
+```
 docker pull tensorflow/serving
 ```
 
 Clone the model repository:
 
-```bash
+```
 mkdir -p /tmp/tfserving
 cd /tmp/tfserving
 git clone https://github.com/jankulik/Bit.git
@@ -16,7 +16,7 @@ git clone https://github.com/jankulik/Bit.git
 
 Next, run TensorFlow serving container with the model:
 
-```bash
+```
 docker run -p 8501:8501 \
   --mount type=bind,\
   source=/tmp/tfserving/Bit/model,\
@@ -26,7 +26,7 @@ docker run -p 8501:8501 \
 
 Finally, install all required packages and run the development server:
 
-```bash
+```
 npm install
 npm run dev
 ```
